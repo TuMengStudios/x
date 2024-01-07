@@ -1,11 +1,9 @@
 package http
 
 import (
-	"context"
 	"net/http"
 
-	"github.com/zeromicro/go-zero/rest/httpx"
-	"google.golang.org/grpc/status"
+	"github.com/gin-gonic/gin"
 
 	"github.com/bitverb/x/errors"
 )
@@ -17,42 +15,37 @@ type BaseResponse[T any] struct {
 	Data   T      `json:"data,omitempty"` // response data
 }
 
-func OkJson(w http.ResponseWriter, v any) {
-	httpx.OkJson(w, wrapBaseResponse(v))
+func OkJson(ctx *gin.Context, v any) {
+	ctx.AbortWithStatusJSON(wrapBaseResponse(v))
 }
 
-func JsonErr(w http.ResponseWriter, err error) {
-	httpx.OkJson(w, wrapBaseResponse(err))
+func Err(ctx *gin.Context, err error) {
+	ctx.AbortWithStatusJSON(wrapBaseResponse(err))
 }
 
-func JsonErrCtx(ctx context.Context, w http.ResponseWriter, v error) {
-	httpx.OkJsonCtx(ctx, w, wrapBaseResponse(v))
-}
-
-func OkJsonCtx(ctx context.Context, w http.ResponseWriter, v any) {
-	httpx.OkJsonCtx(ctx, w, wrapBaseResponse(v))
-}
-
-func wrapBaseResponse(v any) BaseResponse[any] {
-	var resp BaseResponse[any]
+func wrapBaseResponse(v any) (statusCode int, resp BaseResponse[any]) {
 	switch data := v.(type) {
 	case *errors.CodeMsg:
 		resp.ErrNo = data.ErrNo
 		resp.ErrMsg = data.ErrMsg
+		statusCode = data.StatusCode
+
 	case errors.CodeMsg:
 		resp.ErrNo = data.ErrNo
 		resp.ErrMsg = data.ErrMsg
-	case *status.Status:
-		resp.ErrNo = int(data.Code())
-		resp.ErrMsg = data.Message()
+		statusCode = data.StatusCode
+
 	case error:
 		resp.ErrNo = BusinessCodeError
 		resp.ErrMsg = data.Error()
+		statusCode = http.StatusOK
+
 	default:
 		resp.ErrNo = BusinessCodeOK
 		resp.ErrMsg = BusinessMsgOk
 		resp.Data = v
+		statusCode = http.StatusOK
 	}
 
-	return resp
+	return statusCode, resp
 }

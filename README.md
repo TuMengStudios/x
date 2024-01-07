@@ -1,3 +1,3 @@
 # x
 
-x project for go-zero
+x project for gin
