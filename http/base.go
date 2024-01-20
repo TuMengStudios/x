@@ -19,33 +19,35 @@ func OkJson(ctx *gin.Context, v any) {
 	ctx.AbortWithStatusJSON(wrapBaseResponse(v))
 }
 
-func Err(ctx *gin.Context, err error) {
-	ctx.AbortWithStatusJSON(wrapBaseResponse(err))
+// Err 提示错误信息,err 是预先定义的错误提示代码, msg 是运行时的错误
+func Err[T any](ctx *gin.Context, err error, msg T) {
+	ctx.AbortWithStatusJSON(wrapBaseErr[T](err, msg))
 }
 
-func wrapBaseResponse(v any) (statusCode int, resp BaseResponse[any]) {
-	switch data := v.(type) {
+func wrapBaseErr[T any](err error, msg T) (statusCode int, resp BaseResponse[any]) {
+	switch data := err.(type) {
 	case *errors.CodeMsg:
 		resp.ErrNo = data.ErrNo
 		resp.ErrMsg = data.ErrMsg
+		resp.Data = msg
 		statusCode = data.StatusCode
-
-	case errors.CodeMsg:
-		resp.ErrNo = data.ErrNo
-		resp.ErrMsg = data.ErrMsg
-		statusCode = data.StatusCode
-
-	case error:
-		resp.ErrNo = BusinessCodeError
-		resp.ErrMsg = data.Error()
-		statusCode = http.StatusOK
 
 	default:
-		resp.ErrNo = BusinessCodeOK
-		resp.ErrMsg = BusinessMsgOk
-		resp.Data = v
+		resp.ErrNo = BusinessCodeError
+		resp.ErrMsg = data.Error()
+		resp.Data = msg
 		statusCode = http.StatusOK
 	}
+
+	return statusCode, resp
+}
+
+func wrapBaseResponse(v any) (statusCode int, resp BaseResponse[any]) {
+
+	resp.ErrNo = BusinessCodeOK
+	resp.ErrMsg = BusinessMsgOk
+	resp.Data = v
+	statusCode = http.StatusOK
 
 	return statusCode, resp
 }
