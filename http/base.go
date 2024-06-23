@@ -9,22 +9,22 @@ import (
 )
 
 // BaseResponse is the base response struct.
-type BaseResponse[T any] struct {
-	ErrNo  int    `json:"err_no"`         // business err no
-	ErrMsg string `json:"err_msg"`        // business err msg
-	Data   T      `json:"data,omitempty"` // response data
+type BaseResponse struct {
+	ErrNo  int         `json:"err_no"`         // business err no
+	ErrMsg string      `json:"err_msg"`        // business err msg
+	Data   interface{} `json:"data,omitempty"` // response data
 }
 
-func OkJson(ctx *gin.Context, v any) {
+func OkJson[T any](ctx *gin.Context, v interface{}) {
 	ctx.AbortWithStatusJSON(wrapBaseResponse(v))
 }
 
 // Err 提示错误信息,err 是预先定义的错误提示代码, msg 是运行时的错误
 func Err[T any](ctx *gin.Context, err error, msg T) {
-	ctx.AbortWithStatusJSON(wrapBaseErr[T](err, msg))
+	ctx.AbortWithStatusJSON(wrapBaseErr(err, msg))
 }
 
-func wrapBaseErr[T any](err error, msg T) (statusCode int, resp BaseResponse[any]) {
+func wrapBaseErr(err error, msg any) (statusCode int, resp BaseResponse) {
 	switch data := err.(type) {
 	case *errors.CodeMsg:
 		resp.ErrNo = data.ErrNo
@@ -42,7 +42,7 @@ func wrapBaseErr[T any](err error, msg T) (statusCode int, resp BaseResponse[any
 	return statusCode, resp
 }
 
-func wrapBaseResponse(v any) (statusCode int, resp BaseResponse[any]) {
+func wrapBaseResponse(v interface{}) (statusCode int, resp BaseResponse) {
 
 	resp.ErrNo = BusinessCodeOK
 	resp.ErrMsg = BusinessMsgOk
