@@ -7,7 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/bitverb/x/errors"
+	"github.com/TuMengStudios/x/errors"
 )
 
 func TestAny(t *testing.T) {
