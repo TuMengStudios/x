@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/bitverb/x/errors"
+	"github.com/TuMengStudios/x/errors"
 )
 
 // BaseResponse is the base response struct.
