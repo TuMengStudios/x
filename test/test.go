@@ -65,7 +65,7 @@ func (e *Executor[T, Y]) Add(data ...Data[T, Y]) {
 func (e *Executor[T, Y]) Run(t *testing.T, do func(T) Y) {
 	if do == nil {
 		panic("execution body is nil")
-		return
+
 	}
 	for _, v := range e.list {
 		t.Run(v.Name, func(t *testing.T) {
@@ -79,7 +79,7 @@ func (e *Executor[T, Y]) Run(t *testing.T, do func(T) Y) {
 func (e *Executor[T, Y]) RunE(t *testing.T, do func(T) (Y, error)) {
 	if do == nil {
 		panic("execution body is nil")
-		return
+
 	}
 	for _, v := range e.list {
 		t.Run(v.Name, func(t *testing.T) {
