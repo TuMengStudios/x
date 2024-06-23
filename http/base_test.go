@@ -15,5 +15,6 @@ func TestAny(t *testing.T) {
 	}
 	c, _ := gin.CreateTestContext(httptest.NewRecorder())
 	OkJson[HelloRequest](c, HelloRequest{})
+	OkJson(c, HelloRequest{})
 	Err[interface{}](c, errors.New(http.StatusOK, 1, ""), nil)
 }
