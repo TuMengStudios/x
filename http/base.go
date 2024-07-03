@@ -15,6 +15,7 @@ type BaseResponse struct {
 	Data   interface{} `json:"data,omitempty"` // response data
 }
 
+// OkJson response json data
 func OkJson[T any](ctx *gin.Context, v T) {
 	ctx.AbortWithStatusJSON(wrapBaseResponse(v))
 }
